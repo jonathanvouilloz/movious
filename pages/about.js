@@ -1,6 +1,8 @@
 import Image from "next/image";
+import Link from 'next/link'
 
-export default function AboutPage() {
+
+const AboutPage = ({stars}) => {
   return (
     <div className="grid md:grid-cols-2 gap-6 grid-cols-1">
       <div>
@@ -21,6 +23,10 @@ export default function AboutPage() {
             Next.js is a minimalistic framework for creating server-rendered
             React applications.
           </p>
+          {stars.map((post) => (
+            <div key={post._id} ><Link href={`/${post._id}`}><h2 className="text-xl font-bold text-center p-2 cursor-pointer hover:text-blue-700">{post.title}</h2></Link></div>
+            )
+          )}
         </section>
       </div>
 
@@ -33,3 +39,11 @@ export default function AboutPage() {
     </div>
   );
 }
+
+AboutPage.getInitialProps = async (ctx) => {
+  const res = await fetch('http://localhost:3030/api/stuff')
+  const json = await res.json()
+  return { stars: json }
+}
+
+export default AboutPage
