@@ -19,7 +19,11 @@
   },
   "homepage": "https://github.com/taylorbryant/next-starter-tailwind#readme",
   "dependencies": {
+    "@ant-design/icons": "^4.4.0",
+    "axios": "^0.21.1",
+    "moment": "^2.29.1",
     "next": "10.0.4",
+    "next-images": "^1.7.0",
     "react": "17.0.1",
     "react-dom": "17.0.1"
   },

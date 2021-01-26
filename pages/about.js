@@ -1,41 +1,41 @@
-import Image from "next/image";
-import Link from 'next/link'
+import axios from 'axios'
+import React, { useState, useEffect } from 'react';
+import moment from 'moment'
+import Main from '../components/main'
 
 
 const AboutPage = ({stars}) => {
+
+  const [list, setList] = useState(stars);
+  const [currentMonth, setMonth] = useState(1);
+
+  useEffect(() => {
+    // Met à jour le titre du document via l’API du navigateur
+    /*let test = list[2].date
+    const myMomentObject = moment(test, 'YYYY-MM-DD')
+    const month = myMomentObject.locale('fr').format('MMMM');
+    console.log(month);*/
+    const filterMonth = 0;
+    let tableauFormaté = stars.map(obj => {
+      const myMomentObject = moment(obj.date, 'YYYY-MM-DD')
+      const d = myMomentObject.month()
+      const month = myMomentObject.locale('fr').format("MMMM");
+      return {...obj, month};
+    });  
+    console.log(tableauFormaté);
+  });
+
+  const deletePost = async ev => {
+    await axios.delete(`http://localhost:3030/api/stuff/${ev}`)
+    .then(response => {
+      const newList = list.filter((item) => item._id !== ev);
+      setList(newList)
+    })
+  };
+
   return (
-    <div className="grid md:grid-cols-2 gap-6 grid-cols-1">
-      <div>
-        <section className="mb-6">
-          <h2 className="mb-3 text-xl font-bold">What is Tailwind?</h2>
-
-          <p>
-            Tailwind CSS is a highly customizable, low-level CSS framework that
-            gives you all of the building blocks you need to build bespoke
-            designs without any annoying opinionated styles you have to fight to
-            override.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-xl font-bold">What is Next.js?</h2>
-          <p>
-            Next.js is a minimalistic framework for creating server-rendered
-            React applications.
-          </p>
-          {stars.map((post) => (
-            <div key={post._id} ><Link href={`/${post._id}`}><h2 className="text-xl font-bold text-center p-2 cursor-pointer hover:text-blue-700">{post.title}</h2></Link></div>
-            )
-          )}
-        </section>
-      </div>
-
-      <Image
-        alt="A one-eyed alien holding a broken cable connected between a server and a desktop computer"
-        src="/critter.svg"
-        width={476}
-        height={297.17}
-      />
+    <div className="container mx-auto px-8 bg-secondary rounded-3xl p-8">
+      <Main list={list} month={currentMonth} />
     </div>
   );
 }
