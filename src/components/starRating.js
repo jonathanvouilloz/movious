@@ -14,11 +14,11 @@ const StarRating = ({getNote}) => {
             <button
               type="button"
               key={index}
-              className="mx-3 focus:outline-none"
+              className="lg:mx-5 md:mx-2 focus:outline-none mx-1"
               onClick={() => {getNote(index+1), setRating(index)}}
               onMouseEnter={() => setRating(index)}
               onMouseLeave={() => {getNote(index+1), setHover(-1)}}
-            > {rating < index ? <StarOutlined style={{color:'#753742'}}/> : <StarFilled style={{color:'#753742'}} />}
+            > {rating < index ? <StarOutlined style={{color:'#721817'}}/> : <StarFilled style={{color:'#721817'}} />}
             </button>
           );
         })}

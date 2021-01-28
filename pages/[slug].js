@@ -1,10 +1,10 @@
 import React from "react";
+import ArticleDetails from '../src/containers/article-details'
 
 function BlogPostPage({json}) {
   return (
     <div>
-      <h1>{json.title}</h1>
-      <section dangerouslySetInnerHTML={{ __html: json.description }}></section>
+      <ArticleDetails data={json} />
     </div>
   );
 }

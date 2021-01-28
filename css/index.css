@@ -3,3 +3,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.btn {
+    @apply inline-block;
+    @apply px-8;
+    @apply py-3;
+    @apply leading-6;
+    @apply text-center;
+    @apply transition;
+    @apply bg-transparent;
+    @apply rounded-full;
+    @apply bg-primary;
+    @apply hover:bg-primaryLighter;
+    @apply hover:shadow-md;
+    @apply text-secondary; 
+    @apply focus:outline-none;
+  }
+
+  .input {
+      @apply transition appearance-none block w-full bg-secondary text-gray-700 border border-primary rounded-full py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-bg focus:border-gray-500
+  }
+  
