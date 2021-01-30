@@ -20,7 +20,7 @@ export async function getStaticProps(context) {
 // generate HTML paths at build time
 export async function getServerSideProps(context) {
   const slug = context.params.slug
-  const res =  await fetch(`http://localhost:3030/api/stuff/${slug}`)
+  const res =  await fetch(`http://localhost:3030/api/posts/${slug}`)
   const json = await res.json()
 
   return {

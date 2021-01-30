@@ -1,17 +1,20 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import cn from "classnames";
 import Image from "next/image";
 import Router from 'next/router'
 
 export default function Header() {
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
-  const active = Router.pathname
+  const [activeMenu, setActive] = useState('/')
+
+  useEffect(() => {
+    setActive(Router.asPath)
+  })
 
   return (
     <header className="bg-bg">
       <div className="grid items-center justify-between grid-cols-8 px-6 pt-6 mx-auto md:grid-cols-3 lg:container md:px-6">
-      
         <div className="flex items-center col-span-2 md:col-span-1">
         <Link href="/">
           <h2 className="text-2xl font-bold cursor-pointer md:text-3xl">Movious</h2>
@@ -21,7 +24,7 @@ export default function Header() {
         <div className="flex col-span-4 mx-auto md:col-span-1">
           <Link href="/new-article">
             <button className="btn">Nouvel article</button>
-            </Link>
+          </Link>
         </div>
         <div className="flex col-span-2 ml-auto md:col-span-1">
         <ul
@@ -33,7 +36,7 @@ export default function Header() {
             { title: "Nouvel article", route: "/new-article" },
             { title: "About", route: "/about" },
           ].map(({ route, title }) => (
-            <li className={cn("mt-3 md:mt-0 md:ml-6 border-t-2 hover:border-primary transition", active == route ? 'border-primary text-primary':'border-bg')} key={title}>
+            <li className={cn("mt-3 md:mt-0 md:ml-6 border-t-2 hover:border-primary transition", activeMenu == route ? 'border-primary text-primary':'border-bg')} key={title}>
               <Link href={route}>
                 <a>{title}</a>
               </Link>

@@ -5,30 +5,27 @@ import axios from "axios";
 import Image from "next/image";
 
 
-const FormArticle = () => {
+
+const FormArticle = (users) => {
   const [note, setNote] = useState(0);
 
   async function formSubmit(event) {
+    console.log(event.target[0].value);
     event.preventDefault();
     const post = {
       title: event.target[1].value,
-      description: event.target[2].value,
+      type: event.target[2].value,
+      description: event.target[3].value,
       note: note,
-      date: new Date(),
-      type: "Film",
-      userId: 1,
+      date: new Date(),   
+      user_id: event.target[0].value,
     };
     await axios
-      .post("http://localhost:3030/api/stuff", post)
+      .post("http://localhost:3030/api/posts/", post)
       .then((response) => {
         console.log(response);
       });
-    console.log(note);
   }
-
-  const getNote = (val) => {
-    setNote(val);
-  };
 
   return (
     <section className="container px-8 pt-2 pb-8 mx-auto bg-secondary rounded-3xl">
@@ -46,11 +43,14 @@ const FormArticle = () => {
               <label className="block mb-2 ml-1 tracking-wide text-primaryDark">
                 Auteur
               </label>
-              <input
+              <select
                 className="input"
-                id="author"
-                type="text"
-              />
+                placeholder="Regular input"
+              >
+                {users.users.map((item) => (
+                  <option key={item._id} value={item._id} className="rounded-full">{item.name}</option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -110,7 +110,7 @@ const FormArticle = () => {
             <div className="flex px-3 -mt-2">
               <div className="flex items-center justify-center">
                 <div className="flex items-center mt-2 mb-4">
-                  <StarRating getNote={getNote} />
+                  <StarRating getNote={(note)=>setNote(note)} />
                 </div>
               </div>
             </div>
