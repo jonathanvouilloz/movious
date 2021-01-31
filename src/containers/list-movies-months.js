@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import PostRow from "./post_row";
 import Dropdown from "@components/dropdown";
-import moment from 'moment'
+import {sortPosts, filterPosts} from '../services/posts'
 
 
 const months = [
@@ -21,100 +20,49 @@ const months = [
 ];
 
 const MovieListCalendar = ({ posts, users, currentMonth }) => {
+  const defaultFilter = {id:"Tout le monde", name:"all"}
   const [list, setList] = useState(posts);
   const [activeMonth, setMonth] = useState(currentMonth);
-  const [defaultFilter, setDefaultValue] = useState({id:"all", name:"Tout le monde"});
-
-
-  useEffect(() => {
-    // Met à jour le titre du document via l’API du navigateur
-    loadNewMonth()
-  }, [activeMonth]);
+  const [activeFilter, setFilter] = useState(defaultFilter);
 
   const changeMonth = async(ev) => {
-    await ev.target.value == "prev"
-      ? setMonth(activeMonth - 1)
-      : setMonth(activeMonth + 1);
+    let filteredPosts;
+    if(ev.target.value === "prev"){
+      setMonth(activeMonth - 1);
+      filteredPosts = await filterPosts(activeFilter.name, activeMonth - 1)
+    }else{
+      setMonth(activeMonth + 1)
+      filteredPosts = await filterPosts(activeFilter.name, activeMonth + 1)
+    }
+    if(filteredPosts.length === 0){
+      setList([])
+    }else{
+      setList(filteredPosts)
+    }
   };
 
-  const loadNewMonth = async() => {
-    const date = new Date();
-    const fromDate = new Date(date.getFullYear(), activeMonth, 1);
-    const toDate = new Date(date.getFullYear(), activeMonth + 1, 0);    
-    const to = moment(toDate).format('YYYY-MM-DD');
-    const from = moment(fromDate).format('YYYY-MM-DD');
-    await axios.get("http://localhost:3030/api/posts/", {
-      params:{
-        from,
-        to
-      }
-    }).then((data) => {
-      console.log(data.data);
-      if(data.data.length === 0){
-        setList([])
-      }else{
-        setList(data.data)
-      }
-    }).catch((err) => {
-    })
-  }
+  useEffect(() => {
+    setList(posts)
+  },[]);
 
   const filterList = async(val) => {
-    const date = new Date();
-    const fromDate = new Date(date.getFullYear(), activeMonth, 1);
-    const toDate = new Date(date.getFullYear(), activeMonth + 1, 0);    
-    const to = moment(toDate).format('YYYY-MM-DD');
-    const from = moment(fromDate).format('YYYY-MM-DD');
-    await axios.get("http://localhost:3030/api/posts/", {
-      params:{
-        from,
-        to,
-        filter_name:val.name
-      }
-    }).then((data) => {
-      console.log(data);
-      if(data.data.length === 0){
-        setList([])
-      }else{
-        setList(data.data)
-      }
-    }).catch((err) => {
-    })
+    setFilter(val)
+    const filteredPosts = await filterPosts(val.name, activeMonth)
+    if(filteredPosts.length === 0){
+      setList([])
+    }else{
+      setList(filteredPosts)
+    }
   }
-
-  const deletePost = async (id) => {
-    console.log(id);
-    await axios
-      .delete(`http://localhost:3030/api/posts/${id}`)
-      .then((response) => {
-        console.log(response);
-      });
-  };
-
   const sortTable = async(field) => {
-    const date = new Date();
-    const fromDate = new Date(date.getFullYear(), activeMonth, 1);
-    const toDate = new Date(date.getFullYear(), activeMonth + 1, 0);    
-    const to = moment(toDate).format('YYYY-MM-DD');
-    const from = moment(fromDate).format('YYYY-MM-DD');
-    await axios.get("http://localhost:3030/api/posts/", {
-      params:{
-        from,
-        to,
-        sort:field.target.id
-      }
-    }).then((data) => {
-      console.log(data);
-      if(data.data.length === 0){
-        setList([])
-      }else{
-        setList(data.data)
-      }
-    }).catch((err) => {
-    })
+    const sortedPosts = await sortPosts(field, activeMonth, activeFilter.name)
+    if(sortedPosts.length === 0){
+      setList([])
+    }else{
+      setList(sortedPosts)
+    }
   }
 
-  const onChangeDropDown = () => {};
 
   return (
     <section className="container p-8 px-8 mx-auto bg-secondary rounded-3xl">
@@ -184,8 +132,8 @@ const MovieListCalendar = ({ posts, users, currentMonth }) => {
         </div>
       </div>
       <div className="grid content-center grid-cols-1 mx-auto mb-8 md:grid-cols-6">
-        <div className="col-span-1 pl-2 text-right md:pl-6 md:text-left md:col-span-2">
-          <Dropdown data={users} onChange={onChangeDropDown} defaultValue={defaultFilter} onChangeFilter={(filter) => filterList(filter)} />
+        <div className="col-span-1 pl-2 mb-2 text-right md:text-left md:col-span-2">
+          <Dropdown data={users} activeFilter={activeFilter} defaultValue={defaultFilter} onChangeFilter={(filter) => filterList(filter)} />
         </div>
         <div className="col-span-1 text-center md:col-span-2">
           <div className="flex items-center bg-white rounded-full shadow-md">
@@ -218,7 +166,7 @@ const MovieListCalendar = ({ posts, users, currentMonth }) => {
         <div className="col-span-1 text-right md:col-span-2"></div>
       </div>
       <div className="h-1 mx-5 mb-8 border-gray-400 border-t-1" />
-      {list.length == 0 ? 
+      {list.length === 0 ? 
       <div className="items-center w-full mx-auto">
         <h2 className="mb-6 text-center">Aucun enregistrement pour ce mois</h2>
         <div className="text-center">
@@ -232,16 +180,16 @@ const MovieListCalendar = ({ posts, users, currentMonth }) => {
       <table className="min-w-full table-auto">
         <thead className="text-primaryLighter">
           <tr>
-            <th id="author" onClick={(field) => sortTable(field)} className="px-6 py-3 leading-4 tracking-wider text-left ">
+            <th id="name" onClick={(field) => sortTable(field)} className="px-6 py-3 leading-4 tracking-wider text-left cursor-pointer">
               Auteur
             </th>
-            <th id="type" onClick={(field) => sortTable(field)} className="hidden px-6 py-3 leading-4 tracking-wider text-left lg:table-cell">
+            <th id="type" onClick={(field) => sortTable(field)} className="hidden px-6 py-3 leading-4 tracking-wider text-left cursor-pointer lg:table-cell">
               Type
             </th>
-            <th id="title" onClick={(field) => sortTable(field)} className="px-6 py-3 leading-4 tracking-wider text-left">
+            <th id="title" onClick={(field) => sortTable(field)} className="px-6 py-3 leading-4 tracking-wider text-left cursor-pointer">
               Titre
             </th>
-            <th id="note" onClick={(field) => sortTable(field)} className="hidden px-6 py-3 leading-4 tracking-wider text-left lg:table-cell">
+            <th id="note" onClick={(field) => sortTable(field)} className="hidden px-6 py-3 leading-4 tracking-wider text-left cursor-pointer lg:table-cell">
               Note
             </th>
             <th className="px-6 py-3 leading-4 tracking-wider text-left"></th>

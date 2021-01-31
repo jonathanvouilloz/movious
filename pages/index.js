@@ -16,17 +16,17 @@ AboutPage.getInitialProps = async (ctx) => {
 
   let posts;
   const date = new Date();
-  const fromDate = new Date(date.getFullYear(), date.getMonth(), 1);
-  const toDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  const fromDate = new Date(date.getFullYear(), date.getMonth(), 1, 0,0,0);
+  const toDate = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23,59,59);
   const currentMonth = moment().get('month')
-
-  const to = moment(toDate).format('YYYY-MM-DD');
-  const from = moment(fromDate).format('YYYY-MM-DD');
+  const to = moment(toDate).format('YYYY-MM-DD HH:mm:ss');
+  const from = moment(fromDate).format('YYYY-MM-DD HH:mm:ss');
 
   await axios.get("http://localhost:3030/api/posts/", {
       params:{
         from,
-        to
+        to,
+        filter_id:"all"
       }
     }).then((data) => {
       posts = data.data
@@ -34,7 +34,7 @@ AboutPage.getInitialProps = async (ctx) => {
     })
   const usersFetch = await fetch('http://localhost:3030/api/users')
   const users = await usersFetch.json()
-  console.log(currentMonth);
+  console.log(posts);
   return {
     posts,
     users,

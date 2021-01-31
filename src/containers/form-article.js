@@ -2,29 +2,34 @@ import StarRating from "../components/starRating";
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
-import Image from "next/image";
-
-
+import { savePost } from "../services/posts";
 
 const FormArticle = (users) => {
+  const [listUser, setList] = useState(users.users);
   const [note, setNote] = useState(0);
 
   async function formSubmit(event) {
-    console.log(event.target[0].value);
     event.preventDefault();
+
     const post = {
       title: event.target[1].value,
       type: event.target[2].value,
       description: event.target[3].value,
       note: note,
-      date: new Date(),   
-      user_id: event.target[0].value,
+      date: new Date(),
+      user_id:event.target[0].value
     };
+
+    console.log(post);
+ 
     await axios
       .post("http://localhost:3030/api/posts/", post)
       .then((response) => {
-        console.log(response);
-      });
+        console.log("gg wp");
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
 
   return (
@@ -37,20 +42,38 @@ const FormArticle = (users) => {
           Nouvel article
         </h2>
         <form onSubmit={formSubmit} className="w-full max-w-2xl mx-auto">
-
           <div className="flex flex-wrap mb-6 -mx-3">
-            <div className="w-full px-3">
+            <div className="relative inline-block w-full px-3">
               <label className="block mb-2 ml-1 tracking-wide text-primaryDark">
                 Auteur
               </label>
-              <select
-                className="input"
-                placeholder="Regular input"
-              >
-                {users.users.map((item) => (
-                  <option key={item._id} value={item._id} className="rounded-full">{item.name}</option>
+              <select className="input" placeholder="Regular input">
+                {listUser.map((item) => (
+                  <option
+                    key={item._id}
+                    value={item._id}
+                    className="rounded-full"
+                  >
+                    {item.name}
+                  </option>
                 ))}
               </select>
+              <div className="absolute inset-y-0 right-0 flex items-center py-3 pr-6 mt-5 pointer-events-none text-primary">
+                <svg
+                  className="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -59,32 +82,26 @@ const FormArticle = (users) => {
               <label className="block mb-2 ml-1 tracking-wide text-primaryDark">
                 Titre de l'oeuvre
               </label>
-              <input
-                className="input"
-                id="title"
-                type="text"
-              />
+              <input className="input" id="title" type="text" />
             </div>
           </div>
 
           <div className="flex flex-wrap mb-6 -mx-3">
             <div className="relative inline-block w-full px-3">
-            <label className="block mb-2 ml-1 tracking-wide text-primaryDark">
+              <label className="block mb-2 ml-1 tracking-wide text-primaryDark">
                 Type
               </label>
-              <select
-                className="input"
-                placeholder="Regular input"
-              >
+              <select className="input" placeholder="Regular input">
                 <option className="rounded-full">Film</option>
                 <option>Série</option>
                 <option>Animes</option>
                 <option>Livre</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center py-3 pr-6 mt-5 pointer-events-none text-primary">
-                <svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 </svg>
+                
               </div>
             </div>
           </div>
@@ -110,16 +127,14 @@ const FormArticle = (users) => {
             <div className="flex px-3 -mt-2">
               <div className="flex items-center justify-center">
                 <div className="flex items-center mt-2 mb-4">
-                  <StarRating getNote={(note)=>setNote(note)} />
+                  <StarRating getNote={(note) => setNote(note)} />
                 </div>
               </div>
             </div>
           </div>
 
           <div className="md:flex md:justify-center">
-            <button className="btn">
-              Enregistrer
-            </button>
+            <button className="btn">Enregistrer</button>
           </div>
         </form>
       </div>

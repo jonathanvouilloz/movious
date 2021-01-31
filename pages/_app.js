@@ -11,6 +11,7 @@ function MyApp({ Component, pageProps }) {
           name="Description"
           content="A Next.js starter styled using Tailwind CSS."
         />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
       </Head>
 
       <Component {...pageProps} />
